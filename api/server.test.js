@@ -22,7 +22,7 @@ describe("/auth/register", () => {
         .send({ username: "User " }); // a request with no password
 
       expect(res.status).toBe(400);
-      expect(res.text).toBe("username and password required");
+      expect(res.body.message).toBe("username and password required");
     });
     test("fails with missing username", async () => {
       const res = await request(server)
@@ -30,7 +30,7 @@ describe("/auth/register", () => {
         .send({ password: "password" }); // a request with no username
 
       expect(res.status).toBe(400);
-      expect(res.text).toBe("username and password required");
+      expect(res.body.message).toBe("username and password required");
     });
   });
 });
@@ -49,14 +49,14 @@ describe("/auth/login", () => {
       .send({ username: "User", password: "wrong_password" });
 
     expect(res.status).toBe(400);
-    expect(res.text).toBe("invalid credentials");
+    expect(res.body.message).toBe("invalid credentials");
   });
   test("with a valid user, a token is returned", async () => {
     const res = await request(server)
       .post("/api/auth/login")
       .send({ username: "User", password: "password" });
 
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("token");
   });
 });
@@ -77,7 +77,7 @@ describe("/jokes", () => {
       .set("authorization", token);
 
     expect(res.status).toBe(400);
-    expect(res.text).toBe("token invalid");
+    expect(res.body.message).toBe("token invalid");
   });
   test("returns jokes with a valid token", async () => {
     await request(server)

@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
     next();
   } catch (err) {
     if (err.message === "invalid signature")
-      return res.status(400).send("token invalid");
+      return res.status(400).json({ message: "token invalid" });
 
     return res.status(500).send(err);
   }
