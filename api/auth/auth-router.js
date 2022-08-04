@@ -7,11 +7,11 @@ const db = require("../../data/dbConfig");
 router.post("/register", async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password)
-    return res.status(400).send("username and password required");
+    return res.status(400).json({ message: "username and password required"} );
 
   try {
     const existingUser = await db("users").where("username", username).first();
-    if (existingUser) return res.status(400).send("username taken");
+    if (existingUser) return res.status(400).json({ message: "username taken" });
 
     const hashedPassword = bcrypt.hashSync(password, 8);
 
@@ -57,16 +57,16 @@ router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password)
-    return res.status(400).send("username and password required");
+    return res.status(400).json({ message: "username and password required" });
   try {
     const user = await db("users").where("username", username).first();
 
     if (!user || !bcrypt.compareSync(password, user.password))
-      return res.status(400).send("invalid credentials");
+      return res.status(400).json({ message: "invalid credentials" });
 
     const token = jwt.sign(user, "secret");
 
-    return res.status(201).json({
+    return res.status(200).json({
       message: `welcome, ${username}`,
       token,
     });
