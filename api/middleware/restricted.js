@@ -1,5 +1,22 @@
+const jwt = require("jsonwebtoken");
+
 module.exports = (req, res, next) => {
-  next();
+  const { authorization } = req.headers;
+  if (!authorization) next("token required");
+
+  // authorization is in the form "Bearer some_token".
+  const token = authorization.split(" ")[1];
+
+  try {
+    jwt.verify(token, "secret");
+    next();
+  } catch (err) {
+    if (err.message === "invalid signature")
+      return res.status(400).send("token invalid");
+
+    return res.status(500).send(err);
+  }
+
   /*
     IMPLEMENT
 

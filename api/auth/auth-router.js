@@ -1,7 +1,30 @@
-const router = require('express').Router();
+const router = require("express").Router();
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-router.post('/register', (req, res) => {
-  res.end('implement register, please!');
+const db = require("../../data/dbConfig");
+
+router.post("/register", async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password)
+    return res.status(400).send("username and password required");
+
+  try {
+    const existingUser = await db("users").where("username", username).first();
+    if (existingUser) return res.status(400).send("username taken");
+
+    const hashedPassword = bcrypt.hashSync(password, 8);
+
+    const newUserId = await db("users").insert({
+      username,
+      password: hashedPassword,
+    });
+    return res
+      .status(201)
+      .json({ username, password: hashedPassword, id: newUserId });
+  } catch (err) {
+    return res.status(500).send(err);
+  }
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -29,8 +52,28 @@ router.post('/register', (req, res) => {
   */
 });
 
-router.post('/login', (req, res) => {
-  res.end('implement login, please!');
+router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password)
+    return res.status(400).send("username and password required");
+  try {
+    const user = await db("users").where("username", username).first();
+
+    if (!user || !bcrypt.compareSync(password, user.password))
+      return res.status(400).send("invalid credentials");
+
+    const token = jwt.sign(user, "secret");
+
+    return res.status(201).json({
+      message: `welcome, ${username}`,
+      token,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err);
+  }
+
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
