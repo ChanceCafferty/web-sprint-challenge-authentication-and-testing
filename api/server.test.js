@@ -2,7 +2,7 @@
 const db = require("../data/dbConfig");
 const server = require("./server");
 const request = require("supertest");
-const jwt = require("jsonwebtoken");
+
 
 test("sanity", () => {
   expect(true).toBe(true);
