@@ -1,8 +1,6 @@
-// Write your tests here
 const db = require("../data/dbConfig");
 const server = require("./server");
 const request = require("supertest");
-
 
 test("sanity", () => {
   expect(true).toBe(true);
@@ -76,7 +74,7 @@ describe("/jokes", () => {
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     const res = await request(server)
       .get("/api/jokes")
-      .set("authorization", `Bearer ${token}`);
+      .set("authorization", token);
 
     expect(res.status).toBe(400);
     expect(res.text).toBe("token invalid");
@@ -91,7 +89,7 @@ describe("/jokes", () => {
     const { token } = loginRes.body;
     const res = await request(server)
       .get("/api/jokes")
-      .set("authorization", `Bearer ${token}`);
+      .set("authorization", token);
 
     expect(res.status).toBe(200);
     expect(res.body.length).toBe(3);

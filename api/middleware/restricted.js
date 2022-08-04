@@ -4,11 +4,8 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization) next("token required");
 
-  // authorization is in the form "Bearer some_token".
-  const token = authorization.split(" ")[1];
-
   try {
-    jwt.verify(token, "secret");
+    jwt.verify(authorization, "secret");
     next();
   } catch (err) {
     if (err.message === "invalid signature")
